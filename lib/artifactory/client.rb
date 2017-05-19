@@ -12,6 +12,14 @@ module Artifactory
   class Client
     attr_reader :uri, :http, :basic_auth, :headers
 
+    # Initialize an Artifactory client instance
+    #
+    # @param endpoint [String] Artifactory REST API endpoint
+    # @param username [String] Username for HTTP basic authentication
+    # @param password [String] Password for HTTP basic authentication
+    # @param api_key [String] API key
+    # @param ssl_verify [Boolean] Enable/Disable SSL verification
+    #
     def initialize(endpoint:, username: nil, password: nil, api_key: nil, ssl_verify: true)
       basic_auth = {}
       uri = URI.parse(endpoint)
@@ -43,10 +51,21 @@ module Artifactory
       @headers = headers
     end
 
+    # Retrieves the current configuration of a repository. Supported by local, remote and virtual repositories.
+    #
+    # @param key [String] Repository key
+    # @return [Hash] Repository information
+    #
     def get_repo(key:)
       api_get("/repositories/#{key}").tap { |h| h.delete('key') }
     end
 
+    # Returns a list of minimal repository details (unless recurse is enabled) for all repositories of the specified type.
+    #
+    # @param type [nil, local, remote, virtual] Optionally filter by repository type
+    # @param recurse [Boolean] Recursively retrieve repos configuration
+    # @return [Hash] List of repositories
+    #
     def repos(type: nil, recurse: false)
       ret = {}
       params = []
@@ -59,6 +78,12 @@ module Artifactory
       ret
     end
 
+    # Lists all Docker repositories hosted in under an Artifactory Docker repository
+    #
+    # @param repo_key [String] Repository key
+    # @param recurse [Boolean] Recursively retrieve image tags
+    # @return [Hash, Array<String>] List of docker images
+    #
     def docker_images(repo_key:, recurse: false)
       ret = {}
       repolist = api_get("/docker/#{repo_key}/v2/_catalog")['repositories']
@@ -74,14 +99,34 @@ module Artifactory
       images
     end
 
+    # Retrieve all tags for a docker image
+    #
+    # @param repo_key [String] Repository key
+    # @param image_name [String] Docker image name
+    # @return [Array<String>] List of tags
+    #
     def docker_tags(repo_key:, image_name:)
       api_get("/docker/#{repo_key}/v2/#{image_name}/tags/list")['tags']
     end
 
+    # Retrieve a docker image tag manifest
+    #
+    # @param repo_key [String] Repository key
+    # @param image_name [String] Docker image name
+    # @param image_tag [String] Docker image tag
+    # @return [Hash] Docker manifest describing the tag
+    #
     def docker_manifest(repo_key:, image_name:, image_tag:)
       api_get("/docker/#{repo_key}/v2/#{image_name}/manifests/#{image_tag}")
     end
 
+    # Get a flat (the default) or deep listing of the files and folders (not included by default) within a folder
+    #
+    # @param repo_key [String] Repository key
+    # @param image_name [String] Docker image name
+    # @param image_tag [String] Docker image tag
+    # @return [Hash] Docker manifest describing the tag
+    #
     def file_list(repo_key:, folder_path: '/', deep: false, depth: 0, list_folders: false, md_timestamps: false, include_root_path: false)
       path = ["/storage", repo_key, folder_path].join('/').chomp('/')
       params = ['list']
@@ -101,6 +146,12 @@ module Artifactory
       files
     end
 
+    # Get file statistics like the number of times an item was downloaded, last download date and last downloader.
+    #
+    # @param repo_key [String] Repository key
+    # @param path [String] Path of the file to look up
+    # @return [Hash] File statistics
+    #
     def file_stat(repo_key:, path:)
       p = File.join("/storage", repo_key, path).chomp('/')
       params = ['stats']
@@ -119,11 +170,21 @@ module Artifactory
       ret
     end
 
+    # Deletes a file or a folder from the specified destination
+    #
+    # @param repo_key [String] Repository key
+    # @param path [String] Path of the file to delete
+    #
     def file_delete(repo_key:, path:)
       api_delete(File.join(repo_key, path))
     end
 
 private
+    # Dispatch a GET request to the Artifactory API interface
+    #
+    # @param query [String] HTTP request query
+    # @return Response from the server
+    #
     def api_get(query)
       begin
         req = Net::HTTP::Get.new(File.join(self.uri.path, 'api', query), self.headers)
@@ -146,6 +207,10 @@ private
       data
     end
 
+    # Dispatch a DELETE request to the Artifactory API interface
+    #
+    # @param query [String] HTTP request query
+    #
     def api_delete(query)
       begin
         req = Net::HTTP::Delete.new(File.join(self.uri.path, 'api', query), self.headers)
