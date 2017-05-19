@@ -10,5 +10,9 @@ To install it simply issue the following command:
 gem install artifactory-ruby
 ```
 
+## Usage
+
+Online documentation is available at [rubydoc](http://www.rubydoc.info/gems/artifactory-ruby/)
+
 ## Contact
 Matteo Cerutti - matteo.cerutti@hotmail.co.uk
