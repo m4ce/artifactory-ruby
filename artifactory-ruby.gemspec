@@ -18,5 +18,4 @@ Gem::Specification.new do |s|
   s.version = Artifactory.version
 
   s.add_runtime_dependency 'json', '>= 1.7.0'
-  s.add_runtime_dependency 'deep_merge', '>= 1.1.0', '< 2.0.0'
 end
