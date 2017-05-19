@@ -146,6 +146,28 @@ module Artifactory
       files
     end
 
+    # Get file information like last modification time, creation time etc.
+    #
+    # @param repo_key [String] Repository key
+    # @param path [String] Path of the file to look up
+    # @return [Hash] File information
+    #
+    def file_info(repo_key:, path:)
+      ret = {}
+
+      api_get(File.join("/storage", repo_key, path).chomp('/')).each do |k, v|
+        case k
+          when "created", "lastModified", "lastUpdated"
+            ret[k] = Time.parse(v)
+
+          else
+            ret[k] = v
+        end
+      end
+
+      ret
+    end
+
     # Get file statistics like the number of times an item was downloaded, last download date and last downloader.
     #
     # @param repo_key [String] Repository key
