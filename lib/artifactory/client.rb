@@ -244,7 +244,7 @@ module Artifactory
     # @param fields [created, lastModified, lastDownloaded] Date fields that specify which fields the from_date and to_date values should be applied to
     # @return [Hash] Artifacts matching search criteria
     #
-    def search_usage(repo_key:, from_date:, to_date: Time.now, date_fields:)
+    def search_dates(repo_key:, from_date:, to_date: Time.now, date_fields:)
       ret = {}
 
       valid_date_fields = ["created", "lastModified", "lastDownloaded"]
