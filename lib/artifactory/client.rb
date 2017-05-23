@@ -241,7 +241,7 @@ module Artifactory
     # @param repo_key [String, Array<String>] Repository key(s)
     # @param from_date [Time] Return artifacts that have not been used since the given date
     # @param to_date [Time] Return artifacts that have been created before the given date
-    # @param fields [created, lastModified, lastDownloaded] Date fields that specify which fields the from_date and to_date values should be applied to
+    # @param date_fields [created, lastModified, lastDownloaded] Date fields that specify which fields the from_date and to_date values should be applied to
     # @return [Hash] Artifacts matching search criteria
     #
     def search_dates(repo_key:, from_date: nil, to_date: Time.now, date_fields:)
