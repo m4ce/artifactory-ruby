@@ -175,10 +175,11 @@ module Artifactory
     # @return [Hash] File statistics
     #
     def file_stat(repo_key:, path:)
+      ret = {}
+
       p = File.join("/storage", repo_key, path).chomp('/')
       params = ['stats']
 
-      ret = {}
       api_get([p, params.join('&')].join('?')).tap { |h| h.delete('uri') }.each do |k, v|
         case k
           when "lastDownloaded", "remoteLastDownloaded"
@@ -199,6 +200,125 @@ module Artifactory
     #
     def file_delete(repo_key:, path:)
       api_delete(File.join(repo_key, path))
+    end
+
+    # Retrieve all artifacts not downloaded since the specified Java epoch in milliseconds
+    #
+    # @param repo_key [String, Array<String>] Repository key(s)
+    # @param not_used_since [Time] Return artifacts that have not been used since the given date
+    # @param created_before [Time] Return artifacts that have been created before the given date
+    # @return [Hash] Artifacts matching search criteria
+    #
+    def search_usage(repo_key:, not_used_since:, created_before: nil)
+      ret = {}
+
+      path = ["/search", "usage"]
+      params = []
+      params << "notUsedSince=#{not_used_since.to_f.round(3) * 1000.to_i}"
+      params << "createdBefore=#{created_before.to_f.round(3) * 1000.to_i}" if created_before
+      params << "repos=#{repo_key.is_a?(Array) ? repo_key.join(',') : repo_key}"
+
+      api_get([path, params.join('&')].join('?'))['results'].each do |result|
+        result.each do |k, v|
+          case
+            when "lastDownloaded", "remoteLastDownloaded"
+              ret[result['uri']] = Time.parse(v)
+
+            when "uri"
+              next
+
+            else
+              ret[result['uri']] = v
+        end
+      end
+
+      ret
+    end
+
+    # Get all artifacts with specified dates within the given range
+    #
+    # @param repo_key [String, Array<String>] Repository key(s)
+    # @param from_date [Time] Return artifacts that have not been used since the given date
+    # @param to_date [Time] Return artifacts that have been created before the given date
+    # @param fields [created, lastModified, lastDownloaded] Date fields that specify which fields the from_date and to_date values should be applied to
+    # @return [Hash] Artifacts matching search criteria
+    #
+    def search_usage(repo_key:, from_date:, to_date: Time.now, date_fields:)
+      ret = {}
+
+      valid_date_fields = ["created", "lastModified", "lastDownloaded"]
+
+      date_fields.each do |date_field|
+        raise ValueError, "Not a valid date field '#{date_field}'" unless valid_date_fields.include?(date_field)
+      end
+
+      path = ["/search", "dates"]
+      params = []
+      params << "from=#{from_date.to_f.round(3) * 1000.to_i}" unless from_date.nil?
+      params << "to=#{to_date.to_f.round(3) * 1000.to_i}" unless to_date.nil?
+      params << "repos=#{repo_key.is_a?(Array) ? repo_key.join(',') : repo_key}"
+      params << "dateFields=#{date_fields.join(',')}"
+
+      api_get([path, params.join('&')].join('?'))['results'].each do |result|
+        result.each do |k, v|
+          case k
+            when *valid_date_fields
+              ret[result['uri']] = Time.parse(v)
+
+            when "uri"
+              next
+
+            else
+              ret[result['uri']] = v
+      end
+
+      ret
+    end
+
+    # Get all artifacts created in date range
+    #
+    # @param repo_key [String, Array<String>] Repository key(s)
+    # @param from_date [Time] Return artifacts that have not been used since the given date
+    # @param to_date [Time] Return artifacts that have been created before the given date
+    # @return [Hash] Artifacts matching search criteria
+    #
+    def search_creation(repo_key:, from_date:, to_date: Time.now)
+      ret = {}
+
+      path = ["/search", "creation"]
+      params = []
+      params << "from=#{from_date.to_f.round(3) * 1000.to_i}" unless from_date.nil?
+      params << "to=#{to_date.to_f.round(3) * 1000.to_i}" unless to_date.nil?
+      params << "repos=#{repo_key.is_a?(Array) ? repo_key.join(',') : repo_key}"
+
+      api_get([path, params.join('&')].join('?'))['results'].each do |result|
+        result.each do |k, v|
+          case
+            when "created"
+              ret[result['uri']] = Time.parse(v)
+
+            when "uri"
+              next
+
+            else
+              ret[result['uri']] = v
+        end
+      end
+
+      ret
+    end
+
+    # Get all artifacts matching the given path pattern
+    #
+    # @param repo_key [String] Repository key
+    # @param pattern [String] File pattern
+    # @return [Hash] Artifacts matching search pattern
+    #
+    def search_pattern(repo_key:, pattern:)
+      path = ["/search", "pattern"]
+      params = ["pattern=#{repo_key}:#{pattern}"]
+
+      api_get([path, params].join('?'))['results']
     end
 
 private
