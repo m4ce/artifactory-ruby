@@ -219,18 +219,25 @@ module Artifactory
       params << "repos=#{repo_key.is_a?(Array) ? repo_key.join(',') : repo_key}"
 
       api_get([path, params.join('&')].join('?'))['results'].each do |result|
+        path = result['uri'].scan(/\/storage\/(.+?)(\/.*)/).flatten
+
+        file = {
+          "path" => path.join('/'),
+          "repo_key" => path[0],
+          "name" => path[1]
+        }
+
         result.each do |k, v|
           case k
             when "lastDownloaded", "remoteLastDownloaded"
-              ret[result['uri']] = Time.parse(v)
-
-            when "uri"
-              next
+              file[k] = Time.parse(v)
 
             else
-              ret[result['uri']] = v
+              file[k] = v
           end
         end
+
+        ret << file
       end
 
       ret
@@ -260,20 +267,26 @@ module Artifactory
       params << "repos=#{repo_key.is_a?(Array) ? repo_key.join(',') : repo_key}"
       params << "dateFields=#{date_fields.join(',')}"
 
-      puts([path, params.join('&')].join('?'))
       api_get([path, params.join('&')].join('?'))['results'].each do |result|
+        path = result['uri'].scan(/\/storage\/(.+?)(\/.*)/).flatten
+
+        file = {
+          "path" => path.join('/'),
+          "repo_key" => path[0],
+          "name" => path[1]
+        }
+
         result.each do |k, v|
           case k
             when *valid_date_fields
-              ret[result['uri']] = Time.parse(v)
-
-            when "uri"
-              next
+              file[k] = Time.parse(v)
 
             else
-              ret[result['uri']] = v
+              file[k] = v
           end
         end
+
+        ret << file
       end
 
       ret
@@ -296,18 +309,25 @@ module Artifactory
       params << "repos=#{repo_key.is_a?(Array) ? repo_key.join(',') : repo_key}"
 
       api_get([path, params.join('&')].join('?'))['results'].each do |result|
+        path = result['uri'].scan(/\/storage\/(.+?)(\/.*)/).flatten
+
+        file = {
+          "path" => path.join('/'),
+          "repo_key" => path[0],
+          "name" => path[1]
+        }
+
         result.each do |k, v|
           case k
             when "created"
-              ret[result['uri']] = Time.parse(v)
-
-            when "uri"
-              next
+              file[k] = Time.parse(v)
 
             else
-              ret[result['uri']] = v
+              file[k] = v
           end
         end
+
+        ret << file
       end
 
       ret
