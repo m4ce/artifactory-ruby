@@ -219,12 +219,11 @@ module Artifactory
       params << "repos=#{repo_key.is_a?(Array) ? repo_key.join(',') : repo_key}"
 
       api_get([path, params.join('&')].join('?'))['results'].each do |result|
-        path = result['uri'].scan(/\/storage\/(.+?)(\/.*)/).flatten
+        full_path = result['uri'].scan(/\/storage\/(.+?)(\/.*)/).flatten
 
         file = {
-          "path" => path.join,
-          "repo_key" => path[0],
-          "name" => path[1]
+          "repo_key" => full_path[0],
+          "path" => full_path[1]
         }
 
         result.each do |k, v|
@@ -268,12 +267,11 @@ module Artifactory
       params << "dateFields=#{date_fields.join(',')}"
 
       api_get([path, params.join('&')].join('?'))['results'].each do |result|
-        path = result['uri'].scan(/\/storage\/(.+?)(\/.*)/).flatten
+        full_path = result['uri'].scan(/\/storage\/(.+?)(\/.*)/).flatten
 
         file = {
-          "path" => path.join,
-          "repo_key" => path[0],
-          "name" => path[1]
+          "repo_key" => full_path[0],
+          "path" => full_path[1]
         }
 
         result.each do |k, v|
@@ -309,12 +307,11 @@ module Artifactory
       params << "repos=#{repo_key.is_a?(Array) ? repo_key.join(',') : repo_key}"
 
       api_get([path, params.join('&')].join('?'))['results'].each do |result|
-        path = result['uri'].scan(/\/storage\/(.+?)(\/.*)/).flatten
+        full_path = result['uri'].scan(/\/storage\/(.+?)(\/.*)/).flatten
 
         file = {
-          "path" => path.join,
-          "repo_key" => path[0],
-          "name" => path[1]
+          "repo_key" => full_path[0],
+          "path" => full_path[1]
         }
 
         result.each do |k, v|
