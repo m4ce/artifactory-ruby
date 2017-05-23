@@ -229,6 +229,7 @@ module Artifactory
 
             else
               ret[result['uri']] = v
+          end
         end
       end
 
@@ -270,6 +271,8 @@ module Artifactory
 
             else
               ret[result['uri']] = v
+          end
+        end
       end
 
       ret
@@ -302,6 +305,7 @@ module Artifactory
 
             else
               ret[result['uri']] = v
+          end
         end
       end
 
