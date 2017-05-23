@@ -218,10 +218,9 @@ module Artifactory
       params << "createdBefore=#{(created_before.to_f.round(3) * 1000).to_i}" if created_before
       params << "repos=#{repo_key.is_a?(Array) ? repo_key.join(',') : repo_key}"
 
-      puts([path, params.join('&')].join('?'))
       api_get([path, params.join('&')].join('?'))['results'].each do |result|
         result.each do |k, v|
-          case
+          case k
             when "lastDownloaded", "remoteLastDownloaded"
               ret[result['uri']] = Time.parse(v)
 
@@ -297,7 +296,7 @@ module Artifactory
 
       api_get([path, params.join('&')].join('?'))['results'].each do |result|
         result.each do |k, v|
-          case
+          case k
             when "created"
               ret[result['uri']] = Time.parse(v)
 
