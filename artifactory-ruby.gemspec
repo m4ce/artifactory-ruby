@@ -8,7 +8,7 @@ Gem::Specification.new do |s|
   s.name = 'artifactory-ruby'
   s.authors = ['Matteo Cerutti']
   s.date = Date.today.to_s
-  s.description = 'Ruby client library for Kapacitor JSON REST API'
+  s.description = 'Ruby client library for Artifactory REST API'
   s.email = 'matteo.cerutti@hotmail.co.uk'
   s.files = Dir.glob('{lib}/**/*') + %w(LICENSE README.md)
   s.require_paths = ["lib"]
