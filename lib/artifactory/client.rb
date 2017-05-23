@@ -260,6 +260,7 @@ module Artifactory
       params << "repos=#{repo_key.is_a?(Array) ? repo_key.join(',') : repo_key}"
       params << "dateFields=#{date_fields.join(',')}"
 
+      puts([path, params.join('&')].join('?'))
       api_get([path, params.join('&')].join('?'))['results'].each do |result|
         result.each do |k, v|
           case k
@@ -322,7 +323,7 @@ module Artifactory
       path = File.join("/search", "pattern")
       params = ["pattern=#{repo_key}:#{pattern}"]
 
-      api_get([path, params].join('?'))['results']
+      api_get([path, params].join('?'))['files']
     end
 
 private
