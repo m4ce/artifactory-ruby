@@ -210,7 +210,7 @@ module Artifactory
     # @return [Hash] Artifacts matching search criteria
     #
     def search_usage(repo_key:, not_used_since:, created_before: nil)
-      ret = {}
+      ret = []
 
       path = File.join("/search", "usage")
       params = []
@@ -222,7 +222,7 @@ module Artifactory
         path = result['uri'].scan(/\/storage\/(.+?)(\/.*)/).flatten
 
         file = {
-          "path" => path.join('/'),
+          "path" => path.join,
           "repo_key" => path[0],
           "name" => path[1]
         }
@@ -252,7 +252,7 @@ module Artifactory
     # @return [Hash] Artifacts matching search criteria
     #
     def search_dates(repo_key:, from_date: nil, to_date: Time.now, date_fields:)
-      ret = {}
+      ret = []
 
       valid_date_fields = ["created", "lastModified", "lastDownloaded"]
 
@@ -271,7 +271,7 @@ module Artifactory
         path = result['uri'].scan(/\/storage\/(.+?)(\/.*)/).flatten
 
         file = {
-          "path" => path.join('/'),
+          "path" => path.join,
           "repo_key" => path[0],
           "name" => path[1]
         }
@@ -300,7 +300,7 @@ module Artifactory
     # @return [Hash] Artifacts matching search criteria
     #
     def search_creation(repo_key:, from_date: nil, to_date: Time.now)
-      ret = {}
+      ret = []
 
       path = File.join("/search", "creation")
       params = []
@@ -312,7 +312,7 @@ module Artifactory
         path = result['uri'].scan(/\/storage\/(.+?)(\/.*)/).flatten
 
         file = {
-          "path" => path.join('/'),
+          "path" => path.join,
           "repo_key" => path[0],
           "name" => path[1]
         }
