@@ -377,7 +377,7 @@ private
     #
     def api_delete(query)
       begin
-        req = Net::HTTP::Delete.new(File.join(self.uri.path, 'api', query), self.headers)
+        req = Net::HTTP::Delete.new(File.join(self.uri.path, query), self.headers)
         req.basic_auth(self.basic_auth['username'], self.basic_auth['password']) if self.basic_auth
         resp = self.http.request(req)
 
