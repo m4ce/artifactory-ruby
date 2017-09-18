@@ -1,7 +1,3 @@
-#
-# client.rb
-#
-
 require 'net/http'
 require 'uri'
 require 'openssl'
@@ -84,19 +80,8 @@ module Artifactory
     # @param recurse [Boolean] Recursively retrieve image tags
     # @return [Hash, Array<String>] List of docker images
     #
-    def docker_images(repo_key:, recurse: false)
-      ret = {}
-      repolist = api_get("/docker/#{repo_key}/v2/_catalog")['repositories']
-
-      if recurse
-        api_get("/docker/#{repo_key}/v2/_catalog")['repositories'].each do |name|
-          ret[name] = self.docker_tags(repo_key: repo_key, image_name: name)
-        end
-      else
-        ret = repolist
-      end
-
-      images
+    def docker_images(repo_key:)
+      api_get("/docker/#{repo_key}/v2/_catalog")['repositories']
     end
 
     # Retrieve all tags for a docker image
